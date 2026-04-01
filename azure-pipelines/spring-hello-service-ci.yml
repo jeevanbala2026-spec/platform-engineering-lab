@@ -1,0 +1,44 @@
+trigger:
+- main
+- development
+
+pr:
+- main
+- development
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  javaVersion: '17'
+  mavenPomFile: 'spring-hello-service/pom.xml'
+
+steps:
+- task: Cache@2
+  displayName: Cache Maven repository
+  inputs:
+    key: 'maven | "$(Agent.OS)" | $(mavenPomFile)'
+    restoreKeys: |
+      maven | "$(Agent.OS)"
+    path: $(Pipeline.Workspace)/.m2/repository
+
+- task: JavaToolInstaller@0
+  displayName: Use Java $(javaVersion)
+  inputs:
+    versionSpec: $(javaVersion)
+    jdkArchitectureOption: x64
+    jdkSourceOption: PreInstalled
+
+- script: |
+    mvn -f $(mavenPomFile) -Dmaven.repo.local=$(Pipeline.Workspace)/.m2/repository clean test
+  displayName: Build and run tests
+
+- task: PublishTestResults@2
+  displayName: Publish test results
+  condition: succeededOrFailed()
+  inputs:
+    testResultsFormat: JUnit
+    testResultsFiles: '**/surefire-reports/TEST-*.xml'
+    searchFolder: 'spring-hello-service/target'
+    failTaskOnFailedTests: true
+    testRunTitle: 'spring-hello-service tests'
