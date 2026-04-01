@@ -1,6 +1,17 @@
 # Java and Maven
 spring-hello-service/target/
 
+# Frontend (Node/Vite)
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+frontend/.env
+frontend/.env.*
+
 # IDE files
 .vscode/
 .idea/
